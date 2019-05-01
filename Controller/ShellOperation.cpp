@@ -44,12 +44,13 @@ void ShellOperation::openApplication(QString packageName, QString activityName) 
 void ShellOperation::callTapEvent(const int x, const int y) const
 {
     LOG << QString("Tapping at [%1,%2]").arg(x).arg(y);
-    QStringList arg = QStringList()<< QString("tap") << QString::number(x) << QString::number(y);
+    QStringList arg = QStringList()<< QString("-c")
+                                   << QString("/system/bin/input")
+                                   << QString("tap")
+                                   << QString::number(x)
+                                   << QString::number(y);
     LOG << "Args: " << arg;
-    QProcess process;
-    process.startDetached("input", arg );
-    LOG << process.readAllStandardError();
-    LOG << process.readAllStandardOutput();
+    QProcess ::startDetached("su",arg );
 }
 
 void ShellOperation::makeDir(QString folderName) const
@@ -72,4 +73,21 @@ void ShellOperation::screenShot(QString path, QString fileName) const
         LOG << "Capturing false >> Do again";
         process.startDetached("su", QStringList()<< "-c" << "/system/bin/screencap" << "-p" << (path + fileName));
     }
+    delay(5000);
+}
+
+QString ShellOperation::screenShot(QString fileName) const
+{
+    LOG << "Taking screen >> fileName: " << fileName;
+    QString path = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+    if (path.isEmpty()){
+        LOG << "Could't not save to " << path;
+        return QString("");
+    }
+    path.append(QString("/%1").arg(fileName));
+    LOG << "Path: " << path;
+
+    QProcess::startDetached("su", QStringList()<< "-c" << "/system/bin/screencap" << "-p" << (path));
+    delay(5000);
+    return path;
 }
