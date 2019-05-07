@@ -2,7 +2,6 @@ QT += quick
 QT += testlib
 QT += widgets
 
-QT += androidextras
 
 CONFIG += c++11
 
@@ -22,14 +21,19 @@ HEADERS += \
     Controller/ShellOperation.h \
     AppDefines.h \
     Processing/ImageProcessing.h \
-    AppMain.h
+    AppMain.h \
+    AppEnums.h \
+    Controller/MainController.h \
+    Controller/JavaCommunication.h
 
 SOURCES += \
         main.cpp \
     Model.cpp \
     Controller/ShellOperation.cpp \
     Processing/ImageProcessing.cpp \
-    AppMain.cpp
+    AppMain.cpp \
+    Controller/MainController.cpp \
+    Controller/JavaCommunication.cpp
 
 RESOURCES += qml.qrc
 
@@ -50,6 +54,11 @@ DISTFILES += \
 INCLUDEPATH += "$$_PRO_FILE_PWD_/../OpenCV-android-sdk/sdk/native/jni/include"
 
 android {
+
+    DEFINES += ANDROID_KIT
+
+    QT += androidextras
+
     LIBS += \
         -L"$$_PRO_FILE_PWD_/../OpenCV-android-sdk/sdk/native/3rdparty/libs/armeabi-v7a"\
         -L"$$_PRO_FILE_PWD_/../OpenCV-android-sdk/sdk/native/libs/armeabi-v7a"\

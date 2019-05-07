@@ -6,29 +6,47 @@
 #include <QTimer>
 #include <QDebug>
 #include <QScreen>
-#include <QPixmap>
-#include <QFile>
-#include <QDir>
 #include <QQuickView>
 #include <QTest>
-#include <QProcess>
 #include <QString>
+#include "AppDefines.h"
 
 class Model : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(int widthDisplay READ widthDisplay WRITE setWidthDisplay NOTIFY widthDisplayChanged)
+    Q_PROPERTY(int heightDisplay READ heightDisplay WRITE setHeightDisplay NOTIFY heightDisplayChanged)
+
 public:
-    explicit Model(QObject *parent = nullptr);
-    explicit Model(QQuickView *view = nullptr);
+    static Model* instance();
+
+    Q_INVOKABLE void testFunc(int caseIndex, QString extraData);
+
+public:
+    int widthDisplay() const;
+    void setWidthDisplay(const int width);
+
+    int heightDisplay() const;
+    void setHeightDisplay(const int height);
 
 private:
-    QTimer timer;
-    QQuickView* m_view;
-    int count;
-signals:
+    explicit Model(QObject *parent = nullptr);
 
+private:
+    QQuickView* m_view;
+
+    int m_widthDisplay;
+    int m_heightDisplay;
+private:
+    static Model* m_instance;
+
+signals:
+    void widthDisplayChanged();
+    void heightDisplayChanged();
+
+    void requestTestCase(int caseIndex);
 public slots:
-    void onTimeout();
 };
 
 #endif // MODEL_H

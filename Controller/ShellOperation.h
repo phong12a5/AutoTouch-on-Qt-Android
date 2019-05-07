@@ -5,24 +5,30 @@
 #include <QDir>
 #include <QFile>
 #include <QProcess>
-#include <QAndroidJniObject>
 #include <QImage>
 #include "AppDefines.h"
 #include <QStandardPaths>
+
+
 
 class ShellOperation : public QObject
 {
     Q_OBJECT
 public:
     explicit ShellOperation(QObject *parent = nullptr);
-    void initWorkSpace(void) const;
 
 public:
-    void makeDir(QString folderName) const;
+
+#ifdef ANDROID_KIT
+    void initShellCommand() const;
     void screenShot(QString path, QString fileName) const;
     QString screenShot(QString fileName) const;
-    void openApplication(QString packageName, QString activityName) const;
     void callTapEvent(const int x, const int y) const;
+    void callScrollEvent(QPoint point1, QPoint point2);
+#endif
+
+private:
+    QProcess* m_shellProcess;
 signals:
 
 public slots:

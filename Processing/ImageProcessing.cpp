@@ -5,6 +5,7 @@ ImageProcessing::ImageProcessing(QObject *parent) : QObject(parent)
 
 }
 
+#ifdef ANDROID_KIT
 QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, const QString &largeImagePath)
 {
     LOG << "smallImage: " << smallImagePath;
@@ -56,3 +57,4 @@ QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, c
     LOG << "Return values: " << retVal;
     return retVal;
 }
+#endif

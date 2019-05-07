@@ -19,8 +19,9 @@ public:
 
 
 public:
+#ifdef ANDROID_KIT
     static QList<QPoint> findImageOnImage(const QString& smallImage, const QString& largeImage);
-
+#endif
 private:
 
 signals:

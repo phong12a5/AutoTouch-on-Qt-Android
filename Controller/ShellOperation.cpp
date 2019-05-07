@@ -2,43 +2,14 @@
 
 ShellOperation::ShellOperation(QObject *parent) : QObject(parent)
 {
-
+    m_shellProcess = new QProcess(this);
 }
 
-void ShellOperation::initWorkSpace() const
+#ifdef ANDROID_KIT
+void ShellOperation::initShellCommand() const
 {
-    if(!QDir(WORKING_PATH).exists()){
-        LOG << "Creating Working folder: " << QString(WORKING_PATH);
-        QDir().mkdir(QString(WORKING_PATH));
-    }
-    else{
-        LOG << WORKING_PATH << " existed";
-    }
-}
-
-void ShellOperation::openApplication(QString packageName, QString activityName) const
-{
-    LOG << "Openning " << packageName + "/" + activityName;
-    QAndroidJniObject activity = QAndroidJniObject::callStaticObjectMethod("org/qtproject/qt5/android/QtNative", "activity", "()Landroid/app/Activity;");   //activity is valid
-    if ( activity.isValid() )
-    {
-        // Equivalent to Jave code: 'Intent intent = new Intent();'
-        QAndroidJniObject intent("android/content/Intent","()V");
-        if ( intent.isValid() )
-        {
-            QAndroidJniObject param1 = QAndroidJniObject::fromString(packageName);
-            QAndroidJniObject param2 = QAndroidJniObject::fromString(activityName);
-
-            if ( param1.isValid() && param2.isValid() )
-            {
-                // Equivalent to Jave code: 'intent.setClassName(packageName, activityName);'
-                intent.callObjectMethod("setClassName","(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;",param1.object<jobject>(),param2.object<jobject>());
-
-                // Equivalent to Jave code: 'startActivity(intent);'
-                activity.callMethod<void>("startActivity","(Landroid/content/Intent;)V",intent.object<jobject>());
-            }
-        }
-    }
+    LOG;
+//    m_shellProcess->startDetached("su");
 }
 
 void ShellOperation::callTapEvent(const int x, const int y) const
@@ -53,14 +24,23 @@ void ShellOperation::callTapEvent(const int x, const int y) const
     QProcess ::startDetached("su",arg );
 }
 
-void ShellOperation::makeDir(QString folderName) const
+void ShellOperation::callScrollEvent(QPoint point1, QPoint point2)
 {
-    if(!QDir(QString(WORKING_PATH) + folderName).exists()){
-        LOG << "Creating folder: " << folderName;
-        QDir().mkdir(QString(WORKING_PATH) + folderName);
-    }else{
-        LOG << QString(WORKING_PATH) + folderName << " existed";
-    }
+    LOG << QString("Scrolling from [%1,%2] to [%3,%4]")\
+           .arg(point1.x()).arg(point1.y())\
+           .arg(point2.x()).arg(point2.y());
+
+    QStringList arg = QStringList()<< "-c"
+                                   << "input"
+                                   << "swipe"
+                                   << QString::number(point1.x())\
+                                   << QString::number(point1.y())\
+                                   << QString::number(point2.x())\
+                                   << QString::number(point2.y());
+    LOG << "Args: " << arg;
+
+    m_shellProcess->start("su",arg);
+    m_shellProcess->waitForFinished(-1);
 }
 
 void ShellOperation::screenShot(QString path, QString fileName) const
@@ -87,7 +67,8 @@ QString ShellOperation::screenShot(QString fileName) const
     path.append(QString("/%1").arg(fileName));
     LOG << "Path: " << path;
 
-    QProcess::startDetached("su", QStringList()<< "-c" << "/system/bin/screencap" << "-p" << (path));
-    delay(5000);
+    m_shellProcess->start("su", QStringList()<< "-c" << "/system/bin/screencap" << "-p" << (path));
+    m_shellProcess->waitForFinished(-1);
     return path;
 }
+#endif
