@@ -40,19 +40,26 @@ QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, c
     double minval, maxval;
     //ngưỡng chính xác, giảm xuống thì sẽ tìm được nhiều đối tượng hơn nhưng sai số nhiều hơn
 
-    cv::Point minloc, maxloc;
-    cv::minMaxLoc(result, &minval, &maxval, &minloc, &maxloc);
+//    while (true)
+//    {
+        cv::Point minloc, maxloc;
+        cv::minMaxLoc(result, &minval, &maxval, &minloc, &maxloc);
 
-    LOG << "minval: " << minval;
-    LOG << "maxval: " << maxval;
-    LOG << "threshold:" << threshold;
+        LOG << "minval: " << minval;
+        LOG << "maxval: " << maxval;
+        LOG << "threshold:" << threshold;
 
-    if (maxval > threshold)
-    {
-        //vẽ hình chữ nhật lên đối tượng tìm được
+        if (maxval > threshold)
+        {
+            //vẽ hình chữ nhật lên đối tượng tìm được
 
-        retVal << QPoint(maxloc.x + _smallImage.cols/2, maxloc.y + _smallImage.rows/2);
-    }
+            retVal << QPoint(maxloc.x + _smallImage.cols/2, maxloc.y + _smallImage.rows/2);
+//            cv::floodFill(result, maxloc, cv::Scalar(0), 0, cv::Scalar(.1), cv::Scalar(1.));
+
+        }
+//        else
+//            break;
+//    }
 
     LOG << "Return values: " << retVal;
     return retVal;
