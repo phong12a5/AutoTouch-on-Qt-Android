@@ -22,7 +22,9 @@ public:
 #ifdef ANDROID_KIT
     static QList<QPoint> findImageOnImage(const QString& smallImage, const QString& largeImage);
 #endif
+
 private:
+    static cv::Mat QImage2Mat(QImage const& src);
 
 signals:
 

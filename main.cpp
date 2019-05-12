@@ -14,6 +14,8 @@
 
 int main(int argc, char *argv[])
 {
+    LOG << "STARTING ....";
+    LOG << "CURRENT DIR: " << QDir::currentPath();
     QGuiApplication app(argc, argv);
 
     AppMain appMain;

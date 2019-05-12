@@ -14,8 +14,11 @@ QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, c
     QList<QPoint> retVal;
     retVal.clear();
 
-    cv::Mat _smallImage = cv::imread(smallImagePath.toUtf8().constData());
-    cv::Mat _largeImage = cv::imread(largeImagePath.toUtf8().constData());
+    LOG << "Small image: " << QImage(smallImagePath).size();
+    LOG << "Large image: " << QImage(largeImagePath).size();
+
+    cv::Mat _smallImage = QImage2Mat(QImage(smallImagePath));
+    cv::Mat _largeImage = QImage2Mat(QImage(largeImagePath));
 
     //kiểm tra kích cỡ của ảnh input & template
     if (_smallImage.rows > _largeImage.rows || _smallImage.cols > _largeImage.cols)
@@ -24,6 +27,7 @@ QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, c
         return retVal;
     }else if(_smallImage.rows <= 0 || _smallImage.cols <= 0 || _largeImage.rows <= 0 || _largeImage.cols <= 0){
         LOG << "Invalid Image";
+        return retVal;
     }
 
     cv::Mat result;
@@ -38,10 +42,11 @@ QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, c
     double threshold = 0.99;
     cv::threshold(result, result, threshold, 1., CV_THRESH_TOZERO);
     double minval, maxval;
+    double bestMaxval = 0;
     //ngưỡng chính xác, giảm xuống thì sẽ tìm được nhiều đối tượng hơn nhưng sai số nhiều hơn
 
-//    while (true)
-//    {
+    while (true)
+    {
         cv::Point minloc, maxloc;
         cv::minMaxLoc(result, &minval, &maxval, &minloc, &maxloc);
 
@@ -52,16 +57,29 @@ QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, c
         if (maxval > threshold)
         {
             //vẽ hình chữ nhật lên đối tượng tìm được
+            if(maxval > bestMaxval){
+                bestMaxval = maxval;
+                if(!retVal.isEmpty())
+                    retVal.pop_back();
 
-            retVal << QPoint(maxloc.x + _smallImage.cols/2, maxloc.y + _smallImage.rows/2);
-//            cv::floodFill(result, maxloc, cv::Scalar(0), 0, cv::Scalar(.1), cv::Scalar(1.));
+                retVal << QPoint(maxloc.x + _smallImage.cols/2, maxloc.y + _smallImage.rows/2);
+            }
+            cv::floodFill(result, maxloc, cv::Scalar(0), 0, cv::Scalar(.1), cv::Scalar(1.));
 
         }
-//        else
-//            break;
-//    }
+        else
+            break;
+    }
 
-    LOG << "Return values: " << retVal;
+    LOG << "Return values: " << retVal << " --- bestMaxVal: " << bestMaxval;
     return retVal;
+}
+
+cv::Mat ImageProcessing::QImage2Mat(const QImage &src)
+{
+    cv::Mat tmp(src.height(),src.width(),CV_8UC3,(uchar*)src.bits(),src.bytesPerLine());
+    cv::Mat result; // deep copy just in case (my lack of knowledge with open cv)
+    cvtColor(tmp, result,CV_BGR2RGB);
+    return result;
 }
 #endif

@@ -2,7 +2,6 @@ QT += quick
 QT += testlib
 QT += widgets
 
-
 CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use
@@ -48,16 +47,13 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    android-sources/AndroidManifest.xml
 
 INCLUDEPATH += "$$_PRO_FILE_PWD_/../OpenCV-android-sdk/sdk/native/jni/include"
 
 android {
+    QT += androidextras
 
     DEFINES += ANDROID_KIT
-
-    QT += androidextras
 
     LIBS += \
         -L"$$_PRO_FILE_PWD_/../OpenCV-android-sdk/sdk/native/3rdparty/libs/armeabi-v7a"\
@@ -89,4 +85,11 @@ android {
         -lopencv_videostab
 
     ANDROID_PACKAGE_SOURCE_DIR=$$_PRO_FILE_PWD_/android-sources
+
+    DISTFILES += android-sources/AndroidManifest.xml \
+                android-sources/assets/images/
+
+    OTHER_FILES += android-sources/src/JavaInteraction.java
 }
+
+

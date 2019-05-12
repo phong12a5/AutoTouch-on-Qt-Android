@@ -24,22 +24,22 @@ bool MainController::requestLikeNewFeeds()
 {
     LOG;
     bool retVal = false;
-    m_javaCom.openApplication("com.facebook.katana","com.facebook.katana.LoginActivity");
+    m_javaCom.openApplication("com.facebook.lite","com.facebook.lite.MainActivity");
     delay(2000);
     for(int count = 0; count < 10; count ++){
-        m_shellOperation.callScrollEvent(QPoint(500,1200),QPoint(500,300));
         QString scrImg = m_shellOperation.screenShot("screen.png");
-        QList<QPoint> pointList = ImageProcessing::findImageOnImage(LIKE_ICON,scrImg);
+        QList<QPoint> pointList = ImageProcessing::findImageOnImage(LIKE_ICON_LITE,scrImg);
         if(pointList.isEmpty()){
             count --;
-            continue;
+        }else{
+            for(int i = 0; i < pointList.count(); ++i){
+                LOG << "Matching point: " << pointList.at(i);
+                m_shellOperation.callTapEvent(pointList.at(i).x(),pointList.at(i).y());
+                delay(1000);
+                retVal = true;
+            }
         }
-        for(int i = 0; i < pointList.count(); ++i){
-            LOG << "Matching point: " << pointList.at(i);
-            m_shellOperation.callTapEvent(pointList.at(i).x(),pointList.at(i).y());
-            delay(1000);
-            retVal = true;
-        }
+        m_shellOperation.callScrollEvent(QPoint(500,1300),QPoint(500,600));
     }
     return retVal;
 }

@@ -21,7 +21,8 @@ void ShellOperation::callTapEvent(const int x, const int y) const
                                    << QString::number(x)
                                    << QString::number(y);
     LOG << "Args: " << arg;
-    QProcess ::startDetached("su",arg );
+    m_shellProcess->start("su",arg );
+    m_shellProcess->waitForFinished(-1);
 }
 
 void ShellOperation::callScrollEvent(QPoint point1, QPoint point2)
@@ -43,19 +44,6 @@ void ShellOperation::callScrollEvent(QPoint point1, QPoint point2)
     m_shellProcess->waitForFinished(-1);
 }
 
-void ShellOperation::screenShot(QString path, QString fileName) const
-{
-    LOG << "Taking screen >> fileName: " << path + fileName;
-    QProcess process;
-    process.startDetached("su", QStringList()<< "-c" << "/system/bin/screencap" << "-p" << (path + fileName));
-    QImage img(QString(path + fileName));
-    if(img.isNull() || img.size().width() ==0 || img.size().height() == 0){
-        LOG << "Capturing false >> Do again";
-        process.startDetached("su", QStringList()<< "-c" << "/system/bin/screencap" << "-p" << (path + fileName));
-    }
-    delay(5000);
-}
-
 QString ShellOperation::screenShot(QString fileName) const
 {
     LOG << "Taking screen >> fileName: " << fileName;
@@ -64,11 +52,13 @@ QString ShellOperation::screenShot(QString fileName) const
         LOG << "Could't not save to " << path;
         return QString("");
     }
+
     path.append(QString("/%1").arg(fileName));
     LOG << "Path: " << path;
 
-    m_shellProcess->start("su", QStringList()<< "-c" << "/system/bin/screencap" << "-p" << (path));
+    m_shellProcess->start("su", QStringList()<< "-c" << "/system/bin/screencap" << "-p" << path);
     m_shellProcess->waitForFinished(-1);
+
     return path;
 }
 #endif

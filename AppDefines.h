@@ -6,17 +6,23 @@
 
 #define LOG qDebug() << "[" << __FUNCTION__ << "][" << __LINE__ << "] >>"
 
-#define WORKING_FOLDER  "AutoTouchApp"
-#define WORKING_PATH    "/storage/emulated/0/AutoTouchApp/"
 #define delay(milescond)    QTest::qSleep(milescond)
 
-#define PROFILE_ICON    "/sdcard/DCIM/profileIcon.png"
-#define LIKE_ICON       "/sdcard/DCIM/like.png"
-#define FRIEND_ICON     "/sdcard/DCIM/friendIcon.png"
-#define REQUEST_ICON    "/sdcard/DCIM/requestIcon.png"
-#define SEARCH_ICON     "/sdcard/DCIM/searchIcon.png"
-#define SUGGEST_ICON    "/sdcard/DCIM/suggestionsIcon.png"
-#define CONFIRM_ICON    "/sdcard/DCIM/confirmIcon.png"
-#define ADDFRIEND_ICON  "/sdcard/DCIM/addFriendIcon.png"
+#define PROFILE_ICON    "assets:/images/profileIcon.png"
+
+#define LIKE_ICON       "assets:/images/like.png"
+#define LIKE_ICON_LITE  "assets:/images/likeIcon-Lite.png"
+
+#define FRIEND_ICON     "assets:/images/friendIcon.png"
+
+#define REQUEST_ICON    "assets:/images/requestIcon.png"
+
+#define SEARCH_ICON     "assets:/images/searchIcon.png"
+
+#define SUGGEST_ICON    "assets:/images/suggestionsIcon.png"
+
+#define CONFIRM_ICON    "assets:/images/confirmIcon.png"
+
+#define ADDFRIEND_ICON  "assets:/images/addFriendIcon.png"
 
 #endif // APPDEFINES_H
