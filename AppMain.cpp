@@ -44,16 +44,9 @@ void AppMain::connectSignalSlot() const
 
 void AppMain::onRequestTestCase(int testCase)
 {
-    LOG << "testCase: " << testCase;
     switch (testCase) {
     case AppEnums::HMI_CASE_LIKE_NEW_FEED:
-        LOG << MAIN_CONTROLLER->requestLikeNewFeeds();
-        break;
-    case AppEnums::HMI_CASE_ADD_CONFIRM_FRIEND:
-        LOG << MAIN_CONTROLLER->requestAddConfirmFrined();
-        break;
-    case AppEnums::HMI_CASE_ADD_FRIEND_BY_UID:
-        LOG << MAIN_CONTROLLER->requestAddFriendByUID();
+        MAIN_CONTROLLER->requestLikeNewFeeds();
         break;
     default:
         break;

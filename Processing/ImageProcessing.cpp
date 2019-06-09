@@ -5,28 +5,26 @@ ImageProcessing::ImageProcessing(QObject *parent) : QObject(parent)
 
 }
 
-#ifdef ANDROID_KIT
-QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, const QString &largeImagePath)
+QPoint ImageProcessing::findImageOnImage(const QString &smallImagePath, const QString &largeImagePath)
 {
-    LOG << "smallImage: " << smallImagePath;
-    LOG << "largeImage: " << largeImagePath;
+//    LOG << "[ImageProcessing]"  << smallImagePath.split("/").last() << largeImagePath.split("/").last();
 
-    QList<QPoint> retVal;
-    retVal.clear();
+    QPoint retVal;
 
-    LOG << "Small image: " << QImage(smallImagePath).size();
-    LOG << "Large image: " << QImage(largeImagePath).size();
+//    LOG << "[ImageProcessing]" << "Small image: " << QImage(smallImagePath).size();
+//    LOG << "[ImageProcessing]" << "Large image: " << QImage(largeImagePath).size();
+#ifdef USE_OPENCV
 
-    cv::Mat _smallImage = QImage2Mat(QImage(smallImagePath));
-    cv::Mat _largeImage = QImage2Mat(QImage(largeImagePath));
+    cv::Mat _smallImage = cv::imread(smallImagePath.toUtf8().constData());
+    cv::Mat _largeImage = cv::imread(largeImagePath.toUtf8().constData());
 
     //kiểm tra kích cỡ của ảnh input & template
     if (_smallImage.rows > _largeImage.rows || _smallImage.cols > _largeImage.cols)
     {
-        LOG << "Mat template must be smaller than matInput";
+        LOG << "[ImageProcessing]" << "Mat template must be smaller than matInput";
         return retVal;
     }else if(_smallImage.rows <= 0 || _smallImage.cols <= 0 || _largeImage.rows <= 0 || _largeImage.cols <= 0){
-        LOG << "Invalid Image";
+        LOG << "[ImageProcessing]" << "Invalid Image";
         return retVal;
     }
 
@@ -39,7 +37,7 @@ QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, c
     cv::matchTemplate(_largeImage, _smallImage, result, CV_TM_CCORR_NORMED);
 
 
-    double threshold = 0.99;
+    double threshold = 0.98;
     cv::threshold(result, result, threshold, 1., CV_THRESH_TOZERO);
     double minval, maxval;
     double bestMaxval = 0;
@@ -50,19 +48,12 @@ QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, c
         cv::Point minloc, maxloc;
         cv::minMaxLoc(result, &minval, &maxval, &minloc, &maxloc);
 
-        LOG << "minval: " << minval;
-        LOG << "maxval: " << maxval;
-        LOG << "threshold:" << threshold;
-
         if (maxval > threshold)
         {
             //vẽ hình chữ nhật lên đối tượng tìm được
             if(maxval > bestMaxval){
                 bestMaxval = maxval;
-                if(!retVal.isEmpty())
-                    retVal.pop_back();
-
-                retVal << QPoint(maxloc.x + _smallImage.cols/2, maxloc.y + _smallImage.rows/2);
+                retVal = QPoint(maxloc.x + _smallImage.cols/2, maxloc.y + _smallImage.rows/2);
             }
             cv::floodFill(result, maxloc, cv::Scalar(0), 0, cv::Scalar(.1), cv::Scalar(1.));
 
@@ -71,15 +62,31 @@ QList<QPoint> ImageProcessing::findImageOnImage(const QString &smallImagePath, c
             break;
     }
 
-    LOG << "Return values: " << retVal << " --- bestMaxVal: " << bestMaxval;
+//    LOG << "[ImageProcessing]" << "Return values: " << retVal << " --- bestMaxVal: " << bestMaxval;
+#endif
     return retVal;
 }
 
-cv::Mat ImageProcessing::QImage2Mat(const QImage &src)
+QString ImageProcessing::extractCaptchaImage(const QString &path)
 {
-    cv::Mat tmp(src.height(),src.width(),CV_8UC3,(uchar*)src.bits(),src.bytesPerLine());
-    cv::Mat result; // deep copy just in case (my lack of knowledge with open cv)
-    cvtColor(tmp, result,CV_BGR2RGB);
-    return result;
-}
+    LOG << "[ImageProcessing]" << "Path: " << path;
+
+#ifndef USE_OPENCV
+    return  QString("");
+#else
+    cv::Mat src = cv::imread(path.toUtf8().constData());
+    cv::Rect crop(58 , 473, 715, 216);
+    cv::Mat rez = src(crop);
+
+    QString captImgPath = (QDir::currentPath() + "/captcha.png");
+    cv::imwrite(captImgPath.toUtf8().constData(),rez);
+    cv::waitKey(100);
+
+    if(QFile(captImgPath).exists() && !QImage(captImgPath).isNull()){
+        return captImgPath;
+    }else{
+        LOG << "[ImageProcessing]" << "Couldn't extract captcha image";
+        return QString("");
+    }
 #endif
+}

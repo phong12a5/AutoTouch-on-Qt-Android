@@ -3,6 +3,8 @@
 
 #include <QDebug>
 #include <QTest>
+#include <QMap>
+#include <AppEnums.h>
 
 #define LOG qDebug() << "[" << __FUNCTION__ << "][" << __LINE__ << "] >>"
 
@@ -24,5 +26,6 @@
 #define CONFIRM_ICON    "assets:/images/confirmIcon.png"
 
 #define ADDFRIEND_ICON  "assets:/images/addFriendIcon.png"
+
 
 #endif // APPDEFINES_H

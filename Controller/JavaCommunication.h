@@ -6,6 +6,7 @@
 
 #ifdef ANDROID_KIT
 #include <QAndroidJniObject>
+#include <QAndroidJniEnvironment>
 #endif
 
 class JavaCommunication : public QObject
@@ -16,6 +17,15 @@ public:
 
     void openApplication(QString packageName, QString activityName) const;
     void backToAppMain() const;
+
+    QString getDeviceIMEI();
+    QString getDeiceIMSI();
+    QString getDeviceModel();
+    QString getAndroidVersion();
+    QString getAndroidID();
+    QString getSimCardSerialNo();
+    QString getSimNumber();
+
 signals:
 
 public slots:

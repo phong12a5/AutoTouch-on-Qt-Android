@@ -1,8 +1,11 @@
 QT += quick
 QT += testlib
 QT += widgets
+QT += network
+
 
 CONFIG += c++11
+
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -23,7 +26,9 @@ HEADERS += \
     AppMain.h \
     AppEnums.h \
     Controller/MainController.h \
-    Controller/JavaCommunication.h
+    Controller/JavaCommunication.h \
+    Controller/ThreadController.h \
+    Processing/CheckCurrSrcThread.h
 
 SOURCES += \
         main.cpp \
@@ -32,7 +37,9 @@ SOURCES += \
     Processing/ImageProcessing.cpp \
     AppMain.cpp \
     Controller/MainController.cpp \
-    Controller/JavaCommunication.cpp
+    Controller/JavaCommunication.cpp \
+    Controller/ThreadController.cpp \
+    Processing/CheckCurrSrcThread.cpp
 
 RESOURCES += qml.qrc
 
@@ -47,6 +54,7 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+INSTALLS += target
 
 INCLUDEPATH += "$$_PRO_FILE_PWD_/../OpenCV-android-sdk/sdk/native/jni/include"
 
@@ -90,6 +98,11 @@ android {
                 android-sources/assets/images/
 
     OTHER_FILES += android-sources/src/JavaInteraction.java
+}
+
+contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
+    ANDROID_EXTRA_LIBS = \
+        $$PWD/../OpenCV-android-sdk/sdk/native/libs/armeabi-v7a/libopencv_java.so
 }
 
 
